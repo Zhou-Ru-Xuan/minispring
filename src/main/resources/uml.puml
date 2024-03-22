@@ -1,0 +1,76 @@
+@startuml
+class org.springframework.beans.factory.config.BeanDefinition {
+- Class beanClass
++ Class getBeanClass()
++ void setBeanClass(Class)
+}
+
+
+class org.springframework.beans.factory.support.SimpleInstantiationStrategy {
++ Object instantiate(BeanDefinition)
+}
+
+interface org.springframework.beans.factory.support.InstantiationStrategy {
+~ Object instantiate(BeanDefinition)
+}
+
+interface org.springframework.beans.factory.BeanFactory {
+~ Object getBean(String)
+}
+
+class org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy {
++ Object instantiate(BeanDefinition)
+}
+
+class org.springframework.beans.factory.support.DefaultListableBeanFactory {
+- Map<String,BeanDefinition> beanDefinitionMap
++ void registerBeanDefinition(String,BeanDefinition)
+# BeanDefinition getBeanDefinition(String)
+}
+
+
+interface org.springframework.beans.factory.config.SingletonBeanRegistry {
+~ Object getSingleton(String)
+}
+
+interface org.springframework.beans.factory.support.BeanDefinitionRegistry {
+~ void registerBeanDefinition(String,BeanDefinition)
+}
+
+class org.springframework.beans.BeansException {
+}
+abstract class org.springframework.beans.factory.support.AbstractBeanFactory {
++ Object getBean(String)
+# {abstract}Object createBean(String,BeanDefinition)
+# {abstract}BeanDefinition getBeanDefinition(String)
+}
+
+class org.springframework.beans.factory.support.DefaultSingletonBeanRegistry {
+- Map<String,Object> singletonObjects
++ Object getSingleton(String)
+# void addSingleton(String,Object)
+}
+
+
+abstract class org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory {
+- InstantiationStrategy instantiationStrategy
+# Object createBean(String,BeanDefinition)
+# Object doCreateBean(String,BeanDefinition)
+# Object createBeanInstance(BeanDefinition)
++ InstantiationStrategy getInstantiationStrategy()
++ void setInstantiationStrategy(InstantiationStrategy)
+}
+
+
+
+
+org.springframework.beans.factory.support.InstantiationStrategy <|.. org.springframework.beans.factory.support.SimpleInstantiationStrategy
+org.springframework.beans.factory.support.InstantiationStrategy <|.. org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy
+org.springframework.beans.factory.support.BeanDefinitionRegistry <|.. org.springframework.beans.factory.support.DefaultListableBeanFactory
+org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory <|-- org.springframework.beans.factory.support.DefaultListableBeanFactory
+org.springframework.beans.RuntimeException <|-- org.springframework.beans.BeansException
+org.springframework.beans.factory.BeanFactory <|.. org.springframework.beans.factory.support.AbstractBeanFactory
+org.springframework.beans.factory.support.DefaultSingletonBeanRegistry <|-- org.springframework.beans.factory.support.AbstractBeanFactory
+org.springframework.beans.factory.config.SingletonBeanRegistry <|.. org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
+org.springframework.beans.factory.support.AbstractBeanFactory <|-- org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory
+@enduml
