@@ -1,4 +1,4 @@
-package ioc;
+package org.springframework.test.ioc;
 
 
 public class HelloService {
