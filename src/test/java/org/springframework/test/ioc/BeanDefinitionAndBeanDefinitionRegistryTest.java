@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.test.ioc.service.HelloService;
 
 public class BeanDefinitionAndBeanDefinitionRegistryTest {
 
