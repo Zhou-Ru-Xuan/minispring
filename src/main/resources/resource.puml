@@ -1,0 +1,40 @@
+@startuml
+class org.springframework.core.io.UrlResource {
+- URL url
++ InputStream getInputStream()
+}
+
+
+class org.springframework.core.io.ClassPathResource {
+- String path
++ InputStream getInputStream()
+}
+
+
+class org.springframework.core.io.DefaultResourceLoader {
++ {static} String CLASSPATH_URL_PREFIX
++ Resource getResource(String)
+}
+
+
+interface org.springframework.core.io.ResourceLoader {
+~ Resource getResource(String)
+}
+
+class org.springframework.core.io.FileSystemResource {
+- String filePath
++ InputStream getInputStream()
+}
+
+
+interface org.springframework.core.io.Resource {
+~ InputStream getInputStream()
+}
+
+
+
+org.springframework.core.io.Resource <|.. org.springframework.core.io.UrlResource
+org.springframework.core.io.Resource <|.. org.springframework.core.io.ClassPathResource
+org.springframework.core.io.ResourceLoader <|.. org.springframework.core.io.DefaultResourceLoader
+org.springframework.core.io.Resource <|.. org.springframework.core.io.FileSystemResource
+@enduml
