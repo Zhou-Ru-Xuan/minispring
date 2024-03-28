@@ -1,8 +1,11 @@
 @startuml
 class org.springframework.beans.factory.config.BeanDefinition {
 - Class beanClass
+- PropertyValues propertyValues
 + Class getBeanClass()
 + void setBeanClass(Class)
++ PropertyValues getPropertyValues()
++ void setPropertyValues(PropertyValues)
 }
 
 
@@ -17,6 +20,12 @@ interface org.springframework.beans.factory.support.InstantiationStrategy {
 interface org.springframework.beans.factory.BeanFactory {
 ~ Object getBean(String)
 }
+
+class org.springframework.beans.factory.config.BeanReference {
+- String beanName
++ String getBeanName()
+}
+
 
 class org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy {
 + Object instantiate(BeanDefinition)
@@ -45,6 +54,14 @@ abstract class org.springframework.beans.factory.support.AbstractBeanFactory {
 # {abstract}BeanDefinition getBeanDefinition(String)
 }
 
+class org.springframework.beans.PropertyValue {
+- String name
+- Object value
++ String getName()
++ Object getValue()
+}
+
+
 class org.springframework.beans.factory.support.DefaultSingletonBeanRegistry {
 - Map<String,Object> singletonObjects
 + Object getSingleton(String)
@@ -52,13 +69,22 @@ class org.springframework.beans.factory.support.DefaultSingletonBeanRegistry {
 }
 
 
+class org.springframework.beans.PropertyValues {
+- List<PropertyValue> propertyValueList
++ void addPropertyValue(PropertyValue)
++ PropertyValue[] getPropertyValueList()
++ PropertyValue getPropertyValue(String)
+}
+
+
 abstract class org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory {
 - InstantiationStrategy instantiationStrategy
++ InstantiationStrategy getInstantiationStrategy()
++ void setInstantiationStrategy(InstantiationStrategy)
 # Object createBean(String,BeanDefinition)
 # Object doCreateBean(String,BeanDefinition)
 # Object createBeanInstance(BeanDefinition)
-+ InstantiationStrategy getInstantiationStrategy()
-+ void setInstantiationStrategy(InstantiationStrategy)
+# void applyPropertyValues(String,Object,BeanDefinition)
 }
 
 
