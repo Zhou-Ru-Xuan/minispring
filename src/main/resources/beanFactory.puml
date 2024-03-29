@@ -1,5 +1,30 @@
 @startuml
-class org.springframework.beans.factory.config.BeanDefinition {
+interface BeanDefinitionReader {
+~ BeanDefinitionRegistry getRegistry()
+~ ResourceLoader getResourceLoader()
+~ void loadBeanDefinitions(Resource)
+~ void loadBeanDefinitions(String)
+~ void loadBeanDefinitions(String[])
+}
+note top:读取bean定义信息的抽象接口
+
+abstract class AbstractBeanDefinitionReader {
+- BeanDefinitionRegistry registry
+- ResourceLoader resourceLoader
++ BeanDefinitionRegistry getRegistry()
++ void loadBeanDefinitions(String[])
++ void setResourceLoader(ResourceLoader)
++ ResourceLoader getResourceLoader()
+}
+note top:拥有资源加载和beanDefinition注册两种能力
+
+
+interface ListableBeanFactory {
+~ Map<String,T> getBeansOfType(Class<T>)
+~ String[] getBeanDefinitionNames()
+}
+
+class BeanDefinition {
 - Class beanClass
 - PropertyValues propertyValues
 + Class getBeanClass()
@@ -7,77 +32,68 @@ class org.springframework.beans.factory.config.BeanDefinition {
 + PropertyValues getPropertyValues()
 + void setPropertyValues(PropertyValues)
 }
+note top:定义bean信息的类,每个bean对应一个BeanDefinition的实例
 
 
-class org.springframework.beans.factory.support.SimpleInstantiationStrategy {
+class SimpleInstantiationStrategy {
 + Object instantiate(BeanDefinition)
 }
 
-interface org.springframework.beans.factory.support.InstantiationStrategy {
+interface InstantiationStrategy {
 ~ Object instantiate(BeanDefinition)
 }
 
-interface org.springframework.beans.factory.BeanFactory {
+interface BeanFactory {
 ~ Object getBean(String)
 }
 
-class org.springframework.beans.factory.config.BeanReference {
+class BeanReference {
 - String beanName
 + String getBeanName()
 }
 
 
-class org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy {
+class CglibSubclassingInstantiationStrategy {
 + Object instantiate(BeanDefinition)
 }
 
-class org.springframework.beans.factory.support.DefaultListableBeanFactory {
+class DefaultListableBeanFactory {
 - Map<String,BeanDefinition> beanDefinitionMap
 + void registerBeanDefinition(String,BeanDefinition)
 # BeanDefinition getBeanDefinition(String)
 }
 
 
-interface org.springframework.beans.factory.config.SingletonBeanRegistry {
+interface AutowireCapableBeanFactory {
+}
+interface ConfigurableBeanFactory {
+}
+interface SingletonBeanRegistry {
 ~ Object getSingleton(String)
 }
+note top:定义添加和获取单例bean的方法
 
-interface org.springframework.beans.factory.support.BeanDefinitionRegistry {
+interface BeanDefinitionRegistry {
 ~ void registerBeanDefinition(String,BeanDefinition)
 }
+note top:BeanDefinition注册表接口,定义注册BeanDefinition的方法
 
-class org.springframework.beans.BeansException {
-}
-abstract class org.springframework.beans.factory.support.AbstractBeanFactory {
+abstract class AbstractBeanFactory {
 + Object getBean(String)
 # {abstract}Object createBean(String,BeanDefinition)
 # {abstract}BeanDefinition getBeanDefinition(String)
 }
 
-class org.springframework.beans.PropertyValue {
-- String name
-- Object value
-+ String getName()
-+ Object getValue()
+interface HierarchicalBeanFactory {
 }
-
-
-class org.springframework.beans.factory.support.DefaultSingletonBeanRegistry {
+class DefaultSingletonBeanRegistry {
 - Map<String,Object> singletonObjects
 + Object getSingleton(String)
 # void addSingleton(String,Object)
 }
 
 
-class org.springframework.beans.PropertyValues {
-- List<PropertyValue> propertyValueList
-+ void addPropertyValue(PropertyValue)
-+ PropertyValue[] getPropertyValueList()
-+ PropertyValue getPropertyValue(String)
-}
-
-
-abstract class org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory {
+abstract class AbstractAutowireCapableBeanFactory {
 - InstantiationStrategy instantiationStrategy
 + InstantiationStrategy getInstantiationStrategy()
 + void setInstantiationStrategy(InstantiationStrategy)
@@ -88,15 +104,43 @@ abstract class org.springframework.beans.factory.support.AbstractAutowireCapable
 }
 
 
+class XmlBeanDefinitionReader {
++ {static} String BEAN_ELEMENT
++ {static} String PROPERTY_ELEMENT
++ {static} String ID_ATTRIBUTE
++ {static} String NAME_ATTRIBUTE
++ {static} String CLASS_ATTRIBUTE
++ {static} String VALUE_ATTRIBUTE
++ {static} String REF_ATTRIBUTE
++ void loadBeanDefinitions(String)
++ void loadBeanDefinitions(Resource)
+# void doLoadBeanDefinitions(InputStream)
+}
+note top:从xml文件中读取的实现类
 
 
-org.springframework.beans.factory.support.InstantiationStrategy <|.. org.springframework.beans.factory.support.SimpleInstantiationStrategy
-org.springframework.beans.factory.support.InstantiationStrategy <|.. org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy
-org.springframework.beans.factory.support.BeanDefinitionRegistry <|.. org.springframework.beans.factory.support.DefaultListableBeanFactory
-org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory <|-- org.springframework.beans.factory.support.DefaultListableBeanFactory
-org.springframework.beans.RuntimeException <|-- org.springframework.beans.BeansException
-org.springframework.beans.factory.BeanFactory <|.. org.springframework.beans.factory.support.AbstractBeanFactory
-org.springframework.beans.factory.support.DefaultSingletonBeanRegistry <|-- org.springframework.beans.factory.support.AbstractBeanFactory
-org.springframework.beans.factory.config.SingletonBeanRegistry <|.. org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
-org.springframework.beans.factory.support.AbstractBeanFactory <|-- org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory
+interface ConfigurableListableBeanFactory {
+~ BeanDefinition getBeanDefinition(String)
+}
+
+
+
+BeanDefinitionReader <|.. AbstractBeanDefinitionReader
+BeanFactory <|-- ListableBeanFactory
+InstantiationStrategy <|.. SimpleInstantiationStrategy
+InstantiationStrategy <|.. CglibSubclassingInstantiationStrategy
+BeanDefinitionRegistry <|.. DefaultListableBeanFactory
+AbstractAutowireCapableBeanFactory <|-- DefaultListableBeanFactory
+BeanFactory <|-- AutowireCapableBeanFactory
+HierarchicalBeanFactory <|-- ConfigurableBeanFactory
+SingletonBeanRegistry <|-- ConfigurableBeanFactory
+BeanFactory <|.. AbstractBeanFactory
+DefaultSingletonBeanRegistry <|-- AbstractBeanFactory
+BeanFactory <|-- HierarchicalBeanFactory
+SingletonBeanRegistry <|.. DefaultSingletonBeanRegistry
+AbstractBeanFactory <|-- AbstractAutowireCapableBeanFactory
+AbstractBeanDefinitionReader <|-- XmlBeanDefinitionReader
+ListableBeanFactory <|-- ConfigurableListableBeanFactory
+AutowireCapableBeanFactory <|-- ConfigurableListableBeanFactory
+ConfigurableBeanFactory <|-- ConfigurableListableBeanFactory
 @enduml
