@@ -19,11 +19,6 @@ abstract class AbstractBeanDefinitionReader {
 note top: 加载资源+注册beanDefinition
 
 
-interface ListableBeanFactory {
-~ Map<String,T> getBeansOfType(Class<T>)
-~ String[] getBeanDefinitionNames()
-}
-
 class BeanDefinition {
 - Class beanClass
 - PropertyValues propertyValues
@@ -60,14 +55,12 @@ class CglibSubclassingInstantiationStrategy {
 class DefaultListableBeanFactory {
 - Map<String,BeanDefinition> beanDefinitionMap
 + void registerBeanDefinition(String,BeanDefinition)
-# BeanDefinition getBeanDefinition(String)
++ BeanDefinition getBeanDefinition(String)
++ boolean containsBeanDefinition(String)
++ String[] getBeanDefinitionNames()
 }
 
 
-interface AutowireCapableBeanFactory {
-}
-interface ConfigurableBeanFactory {
-}
 interface SingletonBeanRegistry {
 ~ Object getSingleton(String)
 }
@@ -75,21 +68,40 @@ note top:获取单例bean
 
 interface BeanDefinitionRegistry {
 ~ void registerBeanDefinition(String,BeanDefinition)
+~ BeanDefinition getBeanDefinition(String)
+~ boolean containsBeanDefinition(String)
+~ String[] getBeanDefinitionNames()
 }
 note top:注册BeanDefinition
 
+class BeansException {
+}
 abstract class AbstractBeanFactory {
 + Object getBean(String)
 # {abstract}Object createBean(String,BeanDefinition)
 # {abstract}BeanDefinition getBeanDefinition(String)
 }
 
-interface HierarchicalBeanFactory {
+class PropertyValue {
+- String name
+- Object value
++ String getName()
++ Object getValue()
 }
+
+
 class DefaultSingletonBeanRegistry {
 - Map<String,Object> singletonObjects
 + Object getSingleton(String)
 # void addSingleton(String,Object)
+}
+
+
+class PropertyValues {
+- List<PropertyValue> propertyValueList
++ void addPropertyValue(PropertyValue)
++ PropertyValue[] getPropertyValueList()
++ PropertyValue getPropertyValue(String)
 }
 
 
@@ -119,28 +131,17 @@ class XmlBeanDefinitionReader {
 note top:从xml文件中读取beanDefinition
 
 
-interface ConfigurableListableBeanFactory {
-~ BeanDefinition getBeanDefinition(String)
-}
-
 
 
 BeanDefinitionReader <|.. AbstractBeanDefinitionReader
-BeanFactory <|-- ListableBeanFactory
 InstantiationStrategy <|.. SimpleInstantiationStrategy
 InstantiationStrategy <|.. CglibSubclassingInstantiationStrategy
 BeanDefinitionRegistry <|.. DefaultListableBeanFactory
 AbstractAutowireCapableBeanFactory <|-- DefaultListableBeanFactory
-BeanFactory <|-- AutowireCapableBeanFactory
-HierarchicalBeanFactory <|-- ConfigurableBeanFactory
-SingletonBeanRegistry <|-- ConfigurableBeanFactory
+RuntimeException <|-- BeansException
 BeanFactory <|.. AbstractBeanFactory
 DefaultSingletonBeanRegistry <|-- AbstractBeanFactory
-BeanFactory <|-- HierarchicalBeanFactory
 SingletonBeanRegistry <|.. DefaultSingletonBeanRegistry
 AbstractBeanFactory <|-- AbstractAutowireCapableBeanFactory
 AbstractBeanDefinitionReader <|-- XmlBeanDefinitionReader
-ListableBeanFactory <|-- ConfigurableListableBeanFactory
-AutowireCapableBeanFactory <|-- ConfigurableListableBeanFactory
-ConfigurableBeanFactory <|-- ConfigurableListableBeanFactory
 @enduml
