@@ -6,7 +6,6 @@ interface BeanDefinitionReader {
 ~ void loadBeanDefinitions(String)
 ~ void loadBeanDefinitions(String[])
 }
-note top:从资源中读取beanDefinition信息
 
 abstract class AbstractBeanDefinitionReader {
 - BeanDefinitionRegistry registry
@@ -16,7 +15,6 @@ abstract class AbstractBeanDefinitionReader {
 + void setResourceLoader(ResourceLoader)
 + ResourceLoader getResourceLoader()
 }
-note top: 加载资源+注册beanDefinition
 
 
 class BeanDefinition {
@@ -27,7 +25,6 @@ class BeanDefinition {
 + PropertyValues getPropertyValues()
 + void setPropertyValues(PropertyValues)
 }
-note top:bean信息,每个bean对应一个BeanDefinition的实例
 
 
 class SimpleInstantiationStrategy {
@@ -48,6 +45,11 @@ class BeanReference {
 }
 
 
+interface BeanPostProcessor {
+~ Object postProcessBeforeInitialization(Object,String)
+~ Object postProcessAfterInitialization(Object,String)
+}
+
 class CglibSubclassingInstantiationStrategy {
 + Object instantiate(BeanDefinition)
 }
@@ -61,10 +63,22 @@ class DefaultListableBeanFactory {
 }
 
 
+interface AutowireCapableBeanFactory {
+~ Object applyBeanPostProcessorsBeforeInitialization(Object,String)
+~ Object applyBeanPostProcessorsAfterInitialization(Object,String)
+}
+
+interface ConfigurableBeanFactory {
+~ void addBeanPostProcessor(BeanPostProcessor)
+}
+
+interface BeanFactoryPostProcessor {
+~ void postProcessBeanFactory(DefaultListableBeanFactory)
+}
+
 interface SingletonBeanRegistry {
 ~ Object getSingleton(String)
 }
-note top:获取单例bean
 
 interface BeanDefinitionRegistry {
 ~ void registerBeanDefinition(String,BeanDefinition)
@@ -72,21 +86,14 @@ interface BeanDefinitionRegistry {
 ~ boolean containsBeanDefinition(String)
 ~ String[] getBeanDefinitionNames()
 }
-note top:注册BeanDefinition
 
-class BeansException {
-}
 abstract class AbstractBeanFactory {
+- List<BeanPostProcessor> beanPostProcessors
 + Object getBean(String)
 # {abstract}Object createBean(String,BeanDefinition)
 # {abstract}BeanDefinition getBeanDefinition(String)
-}
-
-class PropertyValue {
-- String name
-- Object value
-+ String getName()
-+ Object getValue()
++ void addBeanPostProcessor(BeanPostProcessor)
++ List<BeanPostProcessor> getBeanPostProcessors()
 }
 
 
@@ -97,14 +104,6 @@ class DefaultSingletonBeanRegistry {
 }
 
 
-class PropertyValues {
-- List<PropertyValue> propertyValueList
-+ void addPropertyValue(PropertyValue)
-+ PropertyValue[] getPropertyValueList()
-+ PropertyValue getPropertyValue(String)
-}
-
-
 abstract class AbstractAutowireCapableBeanFactory {
 - InstantiationStrategy instantiationStrategy
 + InstantiationStrategy getInstantiationStrategy()
@@ -112,6 +111,10 @@ abstract class AbstractAutowireCapableBeanFactory {
 # Object createBean(String,BeanDefinition)
 # Object doCreateBean(String,BeanDefinition)
 # Object createBeanInstance(BeanDefinition)
+# Object initializeBean(String,Object,BeanDefinition)
+# void invokeInitMethods(String,Object,BeanDefinition)
++ Object applyBeanPostProcessorsBeforeInitialization(Object,String)
++ Object applyBeanPostProcessorsAfterInitialization(Object,String)
 # void applyPropertyValues(String,Object,BeanDefinition)
 }
 
@@ -128,7 +131,6 @@ class XmlBeanDefinitionReader {
 + void loadBeanDefinitions(Resource)
 # void doLoadBeanDefinitions(InputStream)
 }
-note top:从xml文件中读取beanDefinition
 
 
 
@@ -138,10 +140,13 @@ InstantiationStrategy <|.. SimpleInstantiationStrategy
 InstantiationStrategy <|.. CglibSubclassingInstantiationStrategy
 BeanDefinitionRegistry <|.. DefaultListableBeanFactory
 AbstractAutowireCapableBeanFactory <|-- DefaultListableBeanFactory
-RuntimeException <|-- BeansException
-BeanFactory <|.. AbstractBeanFactory
+BeanFactory <|-- AutowireCapableBeanFactory
+BeanFactory <|-- ConfigurableBeanFactory
+SingletonBeanRegistry <|-- ConfigurableBeanFactory
+ConfigurableBeanFactory <|.. AbstractBeanFactory
 DefaultSingletonBeanRegistry <|-- AbstractBeanFactory
 SingletonBeanRegistry <|.. DefaultSingletonBeanRegistry
+AutowireCapableBeanFactory <|.. AbstractAutowireCapableBeanFactory
 AbstractBeanFactory <|-- AbstractAutowireCapableBeanFactory
 AbstractBeanDefinitionReader <|-- XmlBeanDefinitionReader
 @enduml
