@@ -1,0 +1,273 @@
+@startuml
+interface BeanDefinitionReader {
+~ BeanDefinitionRegistry getRegistry()
+~ ResourceLoader getResourceLoader()
+~ void loadBeanDefinitions(Resource)
+~ void loadBeanDefinitions(String)
+~ void loadBeanDefinitions(String[])
+}
+
+class SimpleInstantiationStrategy {
++ Object instantiate(BeanDefinition)
+}
+
+interface InstantiationStrategy {
+~ Object instantiate(BeanDefinition)
+}
+
+interface ConfigurableApplicationContext {
+~ void refresh()
+}
+
+interface BeanFactory {
+~ Object getBean(String)
+~ T getBean(String,Class<T>)
+}
+
+class BeanReference {
+- String beanName
++ String getBeanName()
+}
+
+
+abstract class AbstractRefreshableApplicationContext {
+- DefaultListableBeanFactory beanFactory
+# void refreshBeanFactory()
+# DefaultListableBeanFactory createBeanFactory()
+# {abstract}void loadBeanDefinitions(DefaultListableBeanFactory)
++ DefaultListableBeanFactory getBeanFactory()
+}
+
+
+class DefaultListableBeanFactory {
+- Map<String,BeanDefinition> beanDefinitionMap
++ void registerBeanDefinition(String,BeanDefinition)
++ BeanDefinition getBeanDefinition(String)
++ void preInstantiateSingletons()
++ boolean containsBeanDefinition(String)
++ Map<String,T> getBeansOfType(Class<T>)
++ String[] getBeanDefinitionNames()
+}
+
+
+interface AutowireCapableBeanFactory {
+~ Object applyBeanPostProcessorsBeforeInitialization(Object,String)
+~ Object applyBeanPostProcessorsAfterInitialization(Object,String)
+}
+
+interface ConfigurableBeanFactory {
+~ void addBeanPostProcessor(BeanPostProcessor)
+}
+
+interface BeanFactoryPostProcessor {
+~ void postProcessBeanFactory(ConfigurableListableBeanFactory)
+}
+
+interface SingletonBeanRegistry {
+~ Object getSingleton(String)
+}
+
+class UrlResource {
+- URL url
++ InputStream getInputStream()
+}
+
+
+interface BeanDefinitionRegistry {
+~ void registerBeanDefinition(String,BeanDefinition)
+~ BeanDefinition getBeanDefinition(String)
+~ boolean containsBeanDefinition(String)
+~ String[] getBeanDefinitionNames()
+}
+
+class BeansException {
+}
+abstract class AbstractBeanFactory {
+- List<BeanPostProcessor> beanPostProcessors
++ Object getBean(String)
++ T getBean(String,Class<T>)
+# {abstract}Object createBean(String,BeanDefinition)
+# {abstract}BeanDefinition getBeanDefinition(String)
++ void addBeanPostProcessor(BeanPostProcessor)
++ List<BeanPostProcessor> getBeanPostProcessors()
+}
+
+
+class ClassPathResource {
+- String path
++ InputStream getInputStream()
+}
+
+
+class DefaultResourceLoader {
++ {static} String CLASSPATH_URL_PREFIX
++ Resource getResource(String)
+}
+
+
+class PropertyValues {
+- List<PropertyValue> propertyValueList
++ void addPropertyValue(PropertyValue)
++ PropertyValue[] getPropertyValueList()
++ PropertyValue getPropertyValue(String)
+}
+
+
+abstract class AbstractAutowireCapableBeanFactory {
+- InstantiationStrategy instantiationStrategy
++ InstantiationStrategy getInstantiationStrategy()
++ void setInstantiationStrategy(InstantiationStrategy)
+# Object createBean(String,BeanDefinition)
+# Object doCreateBean(String,BeanDefinition)
+# Object createBeanInstance(BeanDefinition)
+# Object initializeBean(String,Object,BeanDefinition)
+# void invokeInitMethods(String,Object,BeanDefinition)
++ Object applyBeanPostProcessorsBeforeInitialization(Object,String)
++ Object applyBeanPostProcessorsAfterInitialization(Object,String)
+# void applyPropertyValues(String,Object,BeanDefinition)
+}
+
+
+class FileSystemResource {
+- String filePath
++ InputStream getInputStream()
+}
+
+
+class XmlBeanDefinitionReader {
++ {static} String BEAN_ELEMENT
++ {static} String PROPERTY_ELEMENT
++ {static} String ID_ATTRIBUTE
++ {static} String NAME_ATTRIBUTE
++ {static} String CLASS_ATTRIBUTE
++ {static} String VALUE_ATTRIBUTE
++ {static} String REF_ATTRIBUTE
++ void loadBeanDefinitions(String)
++ void loadBeanDefinitions(Resource)
+# void doLoadBeanDefinitions(InputStream)
+}
+
+
+interface Resource {
+~ InputStream getInputStream()
+}
+
+interface ConfigurableListableBeanFactory {
+~ BeanDefinition getBeanDefinition(String)
+~ void preInstantiateSingletons()
+~ void addBeanPostProcessor(BeanPostProcessor)
+}
+
+abstract class AbstractApplicationContext {
++ void refresh()
+# {abstract}void refreshBeanFactory()
+# void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory)
+# void registerBeanPostProcessors(ConfigurableListableBeanFactory)
++ T getBean(String,Class<T>)
++ Map<String,T> getBeansOfType(Class<T>)
++ Object getBean(String)
++ String[] getBeanDefinitionNames()
++ {abstract}ConfigurableListableBeanFactory getBeanFactory()
+}
+
+abstract class AbstractBeanDefinitionReader {
+- BeanDefinitionRegistry registry
+- ResourceLoader resourceLoader
++ BeanDefinitionRegistry getRegistry()
++ void loadBeanDefinitions(String[])
++ void setResourceLoader(ResourceLoader)
++ ResourceLoader getResourceLoader()
+}
+
+
+class ClassPathXmlApplicationContext {
+- String[] configLocations
+# String[] getConfigLocations()
+}
+
+
+interface ListableBeanFactory {
+~ Map<String,T> getBeansOfType(Class<T>)
+~ String[] getBeanDefinitionNames()
+}
+
+class BeanDefinition {
+- Class beanClass
+- PropertyValues propertyValues
++ Class getBeanClass()
++ void setBeanClass(Class)
++ PropertyValues getPropertyValues()
++ void setPropertyValues(PropertyValues)
+}
+
+
+interface BeanPostProcessor {
+~ Object postProcessBeforeInitialization(Object,String)
+~ Object postProcessAfterInitialization(Object,String)
+}
+
+class CglibSubclassingInstantiationStrategy {
++ Object instantiate(BeanDefinition)
+}
+
+interface ApplicationContext {
+}
+interface ResourceLoader {
+~ Resource getResource(String)
+}
+
+class PropertyValue {
+- String name
+- Object value
++ String getName()
++ Object getValue()
+}
+
+
+class DefaultSingletonBeanRegistry {
+- Map<String,Object> singletonObjects
++ Object getSingleton(String)
+# void addSingleton(String,Object)
+}
+
+
+abstract class AbstractXmlApplicationContext {
+# void loadBeanDefinitions(DefaultListableBeanFactory)
+# {abstract}String[] getConfigLocations()
+}
+
+
+
+InstantiationStrategy <|.. SimpleInstantiationStrategy
+ApplicationContext <|-- ConfigurableApplicationContext
+AbstractApplicationContext <|-- AbstractRefreshableApplicationContext
+ConfigurableListableBeanFactory <|.. DefaultListableBeanFactory
+BeanDefinitionRegistry <|.. DefaultListableBeanFactory
+AbstractAutowireCapableBeanFactory <|-- DefaultListableBeanFactory
+BeanFactory <|-- AutowireCapableBeanFactory
+BeanFactory <|-- ConfigurableBeanFactory
+SingletonBeanRegistry <|-- ConfigurableBeanFactory
+Resource <|.. UrlResource
+RuntimeException <|-- BeansException
+ConfigurableBeanFactory <|.. AbstractBeanFactory
+DefaultSingletonBeanRegistry <|-- AbstractBeanFactory
+Resource <|.. ClassPathResource
+ResourceLoader <|.. DefaultResourceLoader
+AutowireCapableBeanFactory <|.. AbstractAutowireCapableBeanFactory
+AbstractBeanFactory <|-- AbstractAutowireCapableBeanFactory
+Resource <|.. FileSystemResource
+AbstractBeanDefinitionReader <|-- XmlBeanDefinitionReader
+ListableBeanFactory <|-- ConfigurableListableBeanFactory
+AutowireCapableBeanFactory <|-- ConfigurableListableBeanFactory
+ConfigurableBeanFactory <|-- ConfigurableListableBeanFactory
+ConfigurableApplicationContext <|.. AbstractApplicationContext
+DefaultResourceLoader <|-- AbstractApplicationContext
+BeanDefinitionReader <|.. AbstractBeanDefinitionReader
+AbstractXmlApplicationContext <|-- ClassPathXmlApplicationContext
+BeanFactory <|-- ListableBeanFactory
+InstantiationStrategy <|.. CglibSubclassingInstantiationStrategy
+ListableBeanFactory <|-- ApplicationContext
+ResourceLoader <|-- ApplicationContext
+SingletonBeanRegistry <|.. DefaultSingletonBeanRegistry
+AbstractRefreshableApplicationContext <|-- AbstractXmlApplicationContext
+@enduml
